@@ -1,5 +1,6 @@
-// Talks to the FastAPI backend. VITE_API_BASE is the Render URL in production;
-// left empty, requests go to the same site (local start.py or the dev proxy).
+// Talks to the FastAPI backend. Left empty, VITE_API_BASE sends requests to the
+// same site: the /api rewrite on Vercel services, local start.py, or the dev proxy.
+// Set it only when the backend lives on another host (e.g. Render).
 import type { ColumnStat } from "./data";
 
 const BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/+$/, "");
