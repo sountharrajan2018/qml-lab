@@ -50,7 +50,8 @@ def formula(row: list[float], stats: list[dict] | None = None) -> str:
     size = 2**n
     padded = list(row) + [PAD_VALUE] * (size - len(row))
     norm = math.sqrt(sum(x * x for x in padded))
-    terms = [f"{fmt(x)}\\,|{format(i, f'0{n}b')}\\rangle" for i, x in enumerate(padded)]
+    # Zero numbers add nothing, so only the others are written out.
+    terms = [f"{fmt(x)}\\,|{format(i, f'0{n}b')}\\rangle" for i, x in enumerate(padded) if x != 0]
     if len(terms) > 4:
         terms = terms[:3] + ["\\cdots"] + terms[-1:]
     return f"|x\\rangle = \\frac{{1}}{{{fmt(norm)}}}\\big(" + " + ".join(terms) + "\\big)"

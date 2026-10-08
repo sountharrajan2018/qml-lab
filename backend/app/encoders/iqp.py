@@ -11,7 +11,7 @@ import math
 
 from qiskit import QuantumCircuit
 
-from ..core import check_qubits, fmt, rescale
+from ..core import check_qubits, fmt, neighbour_pairs, rescale
 
 # Fixed settings.
 SCALE_TOP = math.pi  # numbers are scaled onto 0..pi
@@ -42,8 +42,8 @@ def build(row: list[float], stats: list[dict]) -> QuantumCircuit:
         # exp(i x Z) = RZ(-2x) and exp(i phi ZZ) = RZZ(-2 phi), up to global phase.
         for q in range(n):
             qc.rz(-2 * x[q], q)
-        for q in range(n - 1):
-            qc.rzz(-2 * pair_strength(x[q], x[q + 1]), q, q + 1)
+        for a, b in neighbour_pairs(n):
+            qc.rzz(-2 * pair_strength(x[a], x[b]), a, b)
     return qc
 
 

@@ -90,6 +90,13 @@ def bloch_vectors(qc: QuantumCircuit) -> list[dict]:
     return vectors
 
 
+def neighbour_pairs(n: int) -> list[tuple[int, int]]:
+    """Pairs (0,1), (2,3), ... then (1,2), (3,4), ... The pair gates used here all
+    commute, so this order changes nothing except letting the drawing put
+    non-touching pairs side by side."""
+    return [(q, q + 1) for start in (0, 1) for q in range(start, n - 1, 2)]
+
+
 def gate_count(qc: QuantumCircuit) -> int:
     return sum(n for name, n in qc.count_ops().items() if name != "barrier")
 

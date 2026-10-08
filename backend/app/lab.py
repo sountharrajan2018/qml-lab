@@ -37,7 +37,7 @@ def for_drawing(qc: QuantumCircuit) -> QuantumCircuit:
     for inst in qc.data:
         op = inst.operation
         if isinstance(op, StatePreparation):
-            op = Gate("State Preparation", op.num_qubits, [])
+            op = Gate("State\nPreparation", op.num_qubits, [])
         out.append(op, inst.qubits, inst.clbits)
     return out
 

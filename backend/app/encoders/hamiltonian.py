@@ -10,7 +10,7 @@ for time t = 1, approximated with two Trotter steps.
 
 from qiskit import QuantumCircuit
 
-from ..core import check_qubits, fmt, rescale
+from ..core import check_qubits, fmt, neighbour_pairs, rescale
 
 # Fixed settings.
 SCALE_TOP = 1.0  # numbers are scaled onto 0..1, so they read as strengths
@@ -38,8 +38,8 @@ def build(row: list[float], stats: list[dict]) -> QuantumCircuit:
         # exp(-i a dt Z) = RZ(2 a dt) and exp(-i b dt XX) = RXX(2 b dt).
         for q in range(n):
             qc.rz(2 * x[q] * dt, q)
-        for q in range(n - 1):
-            qc.rxx(2 * x[q] * x[q + 1] * dt, q, q + 1)
+        for a, b in neighbour_pairs(n):
+            qc.rxx(2 * x[a] * x[b] * dt, a, b)
     return qc
 
 

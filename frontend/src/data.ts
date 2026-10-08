@@ -1,0 +1,88 @@
+// Datasets: the three bundled CSVs and the professor's upload, parsed in the
+// browser. Uploaded files are never sent anywhere except one row at a time.
+import Papa from "papaparse";
+
+export interface ColumnStat {
+  min: number;
+  max: number;
+  median: number;
+}
+
+export interface Dataset {
+  id: string;
+  name: string;
+  columns: string[];
+  rows: number[][];
+  stats: ColumnStat[];
+}
+
+export const BUNDLED = [
+  { id: "toy_2d", name: "Toy: 2 numbers" },
+  { id: "iris_4d", name: "Iris flowers: 4 numbers" },
+  { id: "pixels_16d", name: "Pixels: 16 numbers" },
+];
+
+const MAX_ROWS = 50;
+const MAX_COLUMNS = 16;
+
+function median(values: number[]): number {
+  const s = [...values].sort((a, b) => a - b);
+  const mid = Math.floor(s.length / 2);
+  return s.length % 2 ? s[mid] : (s[mid - 1] + s[mid]) / 2;
+}
+
+function isNumber(text: string): boolean {
+  return text.trim() !== "" && Number.isFinite(Number(text));
+}
+
+/** Parse CSV text, or return one sentence naming the rule it breaks. */
+export function parseCsv(
+  text: string,
+  id: string,
+  name: string,
+): { dataset: Dataset } | { error: string } {
+  const parsed = Papa.parse<string[]>(text.trim(), { skipEmptyLines: "greedy" });
+  const [header, ...body] = parsed.data.map((r) => r.map((c) => c.trim()));
+  if (!header || header.length === 0) return { error: "The file is empty." };
+  if (header.every(isNumber)) {
+    return { error: "The first line must be a header row with a name for each column." };
+  }
+  const labelAt = header.findIndex((h) => h.toLowerCase() === "label");
+  const keep = header.map((_, i) => i).filter((i) => i !== labelAt);
+  if (keep.length === 0) return { error: "The file needs at least one column of numbers." };
+  if (keep.length > MAX_COLUMNS) {
+    return { error: `The file can have at most ${MAX_COLUMNS} columns of numbers.` };
+  }
+  if (body.length === 0) return { error: "The file has a header row but no rows of numbers." };
+  if (body.length > MAX_ROWS) return { error: `The file can have at most ${MAX_ROWS} rows.` };
+  if (body.some((r) => r.length !== header.length)) {
+    return { error: "Every row must have the same number of values as the header row." };
+  }
+  if (body.some((r) => keep.some((i) => !isNumber(r[i])))) {
+    return { error: "Every value must be a number, except in an optional label column." };
+  }
+  const rows = body.map((r) => keep.map((i) => Number(r[i])));
+  const stats = keep.map((_, c) => {
+    const col = rows.map((r) => r[c]);
+    return { min: Math.min(...col), max: Math.max(...col), median: median(col) };
+  });
+  return { dataset: { id, name, columns: keep.map((i) => header[i]), rows, stats } };
+}
+
+export async function loadBundled(id: string, name: string): Promise<Dataset> {
+  const res = await fetch(`${import.meta.env.BASE_URL}datasets/${id}.csv`);
+  const result = parseCsv(await res.text(), id, name);
+  if ("error" in result) throw new Error(result.error);
+  return result.dataset;
+}
+
+/** Short number for the screen: at most 3 decimals, no trailing zeros. */
+export function fmt(x: number): string {
+  const r = Math.round(x * 1000) / 1000;
+  return String(Object.is(r, -0) ? 0 : r);
+}
+
+/** A row of 16 numbers between 0 and 1 is drawn as a 4x4 picture. */
+export function isPicture(values: number[]): boolean {
+  return values.length === 16 && values.every((v) => v >= 0 && v <= 1);
+}
