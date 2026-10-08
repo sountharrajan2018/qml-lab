@@ -1,0 +1,17 @@
+# One-click Render setup for the backend (New -> Blueprint). No Docker.
+services:
+  - type: web
+    name: qml-encoding-lab-api
+    runtime: python
+    plan: free
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn app.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: "3.11.11"
+      # The Vercel site's URL, e.g. https://qml-encoding-lab.vercel.app
+      # Leave it empty on the first deploy and fill it in afterwards.
+      - key: FRONTEND_ORIGIN
+        sync: false
