@@ -46,9 +46,9 @@ and the screen says so plainly.
 
 | | Setting | Result measured in this sandbox |
 | --- | --- | --- |
-| QSVM | IQP encoding on 2 qubits, numbers scaled to 0..π/2, kernel = overlap² of states, scikit-learn SVM on the kernel | 95% on unseen dots (classical SVM: 100%), whole screen in about 1.5 s |
+| QSVM | IQP encoding on 2 qubits, numbers scaled to 0..π/2 using the training dots only, kernel = overlap² of states, scikit-learn SVM on the kernel | 18 of 20 unseen dots (90%; classical SVM: 20 of 20). At 0..π: 16 of 20 |
 | Clustering | Same IQP kernel, spectral clustering into 3 groups | Perfect grouping (same as k-means) |
-| QCNN | Amplitude-encode 16 pixels into 4 qubits, 2 conv + 2 pool layers, 22 dials, trained with COBYLA (48 line pictures, 33 for learning) | 93% on unseen pictures, about 25 s of training |
+| QCNN | Amplitude-encode 16 pixels into 4 qubits, conv + pool layers (4 → 2 → 1 qubits), 22 dials, trained with COBYLA (48 line pictures, 33 for learning) | 14 of 15 unseen pictures (classical neural network: 12 of 15), about 25 s of training |
 
 Lines vs crosses was tried first and failed (53%, a coin toss): amplitude encoding divides by
 the total length, which erases the pixel count that tells a cross from a line. Horizontal vs
