@@ -9,6 +9,7 @@ from . import kernel
 from .datasets import moons
 
 GRID = 40  # the background of the boundary plot is a GRID x GRID set of dots
+MARGIN = 0.15  # the background reaches a little past the learning dots, so unseen dots sit on it
 
 
 def run() -> dict:
@@ -21,8 +22,11 @@ def run() -> dict:
     clf = SVC(kernel="precomputed").fit(K, y)
 
     test_pred = clf.predict(kernel.matrix(kernel.states(Xt, stats), A))
-    xs = np.linspace(stats[0]["min"], stats[0]["max"], GRID)
-    ys = np.linspace(stats[1]["min"], stats[1]["max"], GRID)
+    def axis(s):
+        pad = MARGIN * (s["max"] - s["min"])
+        return np.linspace(s["min"] - pad, s["max"] + pad, GRID)
+
+    xs, ys = axis(stats[0]), axis(stats[1])
     grid = [(a, b) for b in ys for a in xs]
     grid_pred = clf.predict(kernel.matrix(kernel.states(grid, stats), A)).reshape(GRID, GRID)
 

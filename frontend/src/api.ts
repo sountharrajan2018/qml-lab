@@ -2,6 +2,7 @@
 // same site: the /api rewrite on Vercel services, local start.py, or the dev proxy.
 // Set it only when the backend lives on another host (e.g. Render).
 import type { ColumnStat } from "./data";
+import type { Algorithm, PipelineResult } from "./pipeline/types";
 
 const BASE = (import.meta.env.VITE_API_BASE ?? "").replace(/\/+$/, "");
 
@@ -62,6 +63,10 @@ export function compare(
   signal?: AbortSignal,
 ): Promise<CompareResult[]> {
   return post("/api/compare", { row, column_stats: stats }, signal);
+}
+
+export function pipeline(algorithm: Algorithm, signal?: AbortSignal): Promise<PipelineResult> {
+  return post("/api/pipeline", { algorithm }, signal);
 }
 
 /** Wake a sleeping free server as soon as the page opens. */

@@ -42,9 +42,10 @@ def for_drawing(qc: QuantumCircuit) -> QuantumCircuit:
     return out
 
 
-def circuit_svg(qc: QuantumCircuit) -> str:
+def circuit_svg(qc: QuantumCircuit, fontsize: int | None = None) -> str:
+    style = DRAW_STYLE if fontsize is None else {**DRAW_STYLE, "fontsize": fontsize}
     with _draw_lock:
-        fig = for_drawing(qc).draw("mpl", style=DRAW_STYLE, fold=-1)
+        fig = for_drawing(qc).draw("mpl", style=style, fold=-1)
         buf = io.StringIO()
         fig.savefig(buf, format="svg", bbox_inches="tight", facecolor="#000000")
         plt.close(fig)

@@ -54,7 +54,7 @@ def build(algorithm: str) -> dict:
             "gate_count": loading_cost("amplitude", qc),
             "n_qubits": qc.num_qubits,
         }
-        out["model_circuit"] = {"svg": circuit_svg(res["model"]), "n_dials": qcnn.N_DIALS}
+        out["model_circuit"] = {"svg": circuit_svg(res["model"], fontsize=13), "n_dials": qcnn.N_DIALS}
         truth = yt
     else:
         res = qsvm.run() if algorithm == "qsvm" else clustering.run()

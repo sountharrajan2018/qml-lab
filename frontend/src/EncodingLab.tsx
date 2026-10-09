@@ -44,7 +44,7 @@ function CodeDrawer({ code }: { code: { qiskit: string; pennylane: string } }) {
   );
 }
 
-export default function EncodingLab() {
+export default function EncodingLab({ onOpenPipeline }: { onOpenPipeline?: () => void } = {}) {
   const [datasets, setDatasets] = useState<Dataset[]>([]);
   const [datasetId, setDatasetId] = useState("toy_2d");
   const [rowIndex, setRowIndex] = useState(0);
@@ -56,7 +56,7 @@ export default function EncodingLab() {
   const [comparing, setComparing] = useState(false);
   const [compareResults, setCompareResults] = useState<CompareResult[] | null>(null);
   const [explainStep, setExplainStep] = useState(0); // 0 off, 1-3 panels, 4 formula
-  const [presenter, setPresenter] = useState(false);
+  const [presenter, setPresenter] = useState(() => document.documentElement.classList.contains("presenter"));
   const [showCode, setShowCode] = useState(false);
   const [uploadError, setUploadError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
@@ -228,6 +228,14 @@ export default function EncodingLab() {
           >
             {step === 0 ? "Explain" : step < 4 ? `Next (${step} of 4)` : "Done"}
           </button>
+          {onOpenPipeline && (
+            <button
+              onClick={onOpenPipeline}
+              className="rounded-xl bg-zinc-900 px-5 py-3 text-lg font-semibold text-zinc-200 hover:bg-zinc-800"
+            >
+              Pipeline →
+            </button>
+          )}
           <button
             onClick={() => fileInput.current?.click()}
             className="rounded-xl px-3 py-3 text-sm text-zinc-400 hover:bg-zinc-900"

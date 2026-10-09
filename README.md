@@ -93,6 +93,38 @@ All results are exact (Qiskit `Statevector`). Labels read left to right: in |01�
 
 ---
 
+## The QML Pipeline (second screen)
+
+Click **Pipeline →** in the top bar (or open `<your-vercel-link>/#pipeline`). It walks one full
+quantum machine learning run in six steps:
+
+**1 Your data → 2 Prepare → 3 Encode → 4 Compare pairs (kernel) → 5 Learn → 6 Result**
+
+| Tab (key) | Data | Result on unseen data (quantum vs classical) |
+| --- | --- | --- |
+| Quantum SVM (**1**) | two half-moons, 40 dots + 20 unseen | 18/20 vs classical SVM 20/20 |
+| Quantum clustering (**2**) | three blobs, 30 dots, no labels | 30/30 vs k-means 30/30 |
+| Quantum CNN (**3**) | 4×4 line pictures, lying vs standing, 33 + 15 unseen | 14/15 vs small neural network 12/15 |
+
+Use **→** / **←** (or **E**) to move between steps. Every step has **Show details** (the maths)
+and **Show code** (Qiskit and PennyLane). The QCNN has no kernel: step 4 shows its trainable
+circuit instead, and step 5 replays its training curve (it was trained ahead of time).
+
+**Datasets** (all generated from fixed seeds) are in
+[`frontend/public/datasets/pipeline/`](frontend/public/datasets/pipeline/) and download from
+`<your-vercel-link>/datasets/pipeline/moons_train.csv` (also `moons_test.csv`, `blobs.csv`,
+`lines_train.csv`, `lines_test.csv`).
+
+**Notebook for students:** [`notebooks/qml_pipeline.ipynb`](notebooks/qml_pipeline.ipynb) runs the
+same three pipelines with the same numbers. To run it in Google Colab, open
+[colab.research.google.com](https://colab.research.google.com), choose **GitHub**, paste this
+repository's URL and pick the notebook (the repository must be public), or download the file and
+use **File → Upload notebook**. Then **Runtime → Run all** (about a minute for installs, then 40 s).
+
+The plan behind it is in [PIPELINE_PLAN.md](PIPELINE_PLAN.md).
+
+---
+
 ## For developers (optional)
 
 Not needed for anything above. With Python 3.11+ and Node 20.19+:
@@ -106,4 +138,6 @@ Tests: `pip install -r backend/requirements-dev.txt` then `cd backend && pytest`
 
 Layout: `backend/app/main.py` (FastAPI app, one `APIRouter` under `/api`), `backend/app/encoders/`
 (one file per encoding), `backend/app/snippets/` (code shown in the drawer),
-`frontend/src/EncodingLab.tsx` (the whole app as one `<EncodingLab />` component).
+`frontend/src/EncodingLab.tsx` (the whole app as one `<EncodingLab />` component),
+`backend/app/pipeline/` and `frontend/src/pipeline/` (the Pipeline screen, `POST /api/pipeline`).
+Retrain the QCNN with `cd backend && python -m app.pipeline.qcnn`.

@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 
 /** Make Qiskit's SVG fill the panel, but scroll sideways instead of shrinking a wide circuit. */
-function fitSvg(svg: string): string {
+export function fitSvg(svg: string): string {
   const box = svg.match(/viewBox="([^"]+)"/);
   const width = box ? Number(box[1].trim().split(/\s+/)[2]) : 400;
   return svg
