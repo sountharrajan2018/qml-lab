@@ -22,17 +22,18 @@ def n_qubits(n_numbers: int) -> int:
     return n_numbers
 
 
-def scale(row: list[float], stats: list[dict]) -> list[float]:
-    return [rescale(x, s, SCALE_TOP) for x, s in zip(row, stats)]
+def scale(row: list[float], stats: list[dict], scale_top: float = SCALE_TOP) -> list[float]:
+    return [rescale(x, s, scale_top) for x, s in zip(row, stats)]
 
 
 def pair_strength(a: float, b: float) -> float:
     return (math.pi - a) * (math.pi - b)
 
 
-def build(row: list[float], stats: list[dict]) -> QuantumCircuit:
+def build(row: list[float], stats: list[dict], scale_top: float = SCALE_TOP) -> QuantumCircuit:
+    """scale_top lets the pipeline's kernel use a narrower range (see app/pipeline/kernel.py)."""
     check_qubits(n_qubits(len(row)), len(row))
-    x = scale(row, stats)
+    x = scale(row, stats, scale_top)
     n = len(x)
     qc = QuantumCircuit(n)
     for rep in range(REPS):

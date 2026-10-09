@@ -11,6 +11,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import lab
+from .pipeline import run as pipeline
 from .encoders import ENCODERS
 
 MAX_NUMBERS = 16  # the upload rule allows at most 16 columns
@@ -54,6 +55,15 @@ def encode(req: EncodeRequest) -> dict:
     return lab.encode(req.encoding, req.row, stats_for(req))
 
 
+class PipelineRequest(BaseModel):
+    algorithm: Literal["qsvm", "clustering", "qcnn"]
+
+
+@router.post("/pipeline")
+def run_pipeline(req: PipelineRequest) -> dict:
+    return pipeline.build(req.algorithm)
+
+
 @router.post("/compare")
 def compare(req: RowRequest) -> list[dict]:
     return lab.compare(req.row, stats_for(req))
@@ -68,6 +78,7 @@ def allowed_origins() -> list[str]:
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     lab.warm_up()
+    pipeline.warm_up()
     yield
 
 
