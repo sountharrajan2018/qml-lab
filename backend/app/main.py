@@ -11,6 +11,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 
 from . import lab
+from .core import CannotEncode
+from .pipeline import builder
 from .pipeline import run as pipeline
 from .encoders import ENCODERS
 
@@ -62,6 +64,40 @@ class PipelineRequest(BaseModel):
 @router.post("/pipeline")
 def run_pipeline(req: PipelineRequest) -> dict:
     return pipeline.build(req.algorithm)
+
+
+class BuilderData(BaseModel):
+    X: list[list[Number]] = Field(min_length=1, max_length=builder.MAX_ROWS)
+
+
+class BuilderEncodeRequest(BuilderData):
+    encoding: Literal["angle", "zz", "iqp", "amplitude", "hamiltonian", "basis"]
+
+
+class BuilderRunRequest(BuilderEncodeRequest):
+    labels: list[str] | None = None
+    kernel: Literal["fidelity", "fidelity_shots", "projected"]
+    algorithm: Literal["qsvm", "qknn", "qclustering", "qnn"]
+
+
+def plain(fn):
+    """Run a builder step; a rule the data breaks comes back as one sentence."""
+    try:
+        return fn()
+    except CannotEncode as e:
+        raise HTTPException(400, str(e)) from None
+
+
+@router.post("/builder/encode")
+def builder_encode(req: BuilderEncodeRequest) -> dict:
+    return plain(lambda: builder.encoding_preview(req.encoding, req.X))
+
+
+@router.post("/builder/run")
+def builder_run(req: BuilderRunRequest) -> dict:
+    if req.labels is not None and len(req.labels) != len(req.X):
+        raise HTTPException(400, "Every row needs a label.")
+    return plain(lambda: builder.run(req.X, req.labels, req.encoding, req.kernel, req.algorithm))
 
 
 @router.post("/compare")
