@@ -93,35 +93,45 @@ All results are exact (Qiskit `Statevector`). Labels read left to right: in |01�
 
 ---
 
-## The QML Pipeline (second screen)
+## The QML Pipeline Builder
 
-Click **Pipeline →** in the top bar (or open `<your-vercel-link>/#pipeline`). It walks one full
-quantum machine learning run in six steps:
+Click **Pipeline →** in the top bar (or open `<your-vercel-link>/#pipeline`). Students build their own
+quantum machine learning pipeline from four menus, one after the other, then press **Run the pipeline ▶**:
 
-**1 Your data → 2 Prepare → 3 Encode → 4 Compare pairs (kernel) → 5 Learn → 6 Result**
+| Menu | Choices |
+| --- | --- |
+| 1 Data | Sample datasets (Students: will they pass? · Healthcare: diabetes risk · Finance: loan approval · Two moons), or **Upload your own CSV** |
+| 2 Encoding | Angle · ZZ feature map · IQP · Amplitude · Hamiltonian · Basis |
+| 3 Quantum kernel | Fidelity (exact) · Fidelity with 1024 shots (like real hardware) · Projected quantum kernel |
+| 4 Algorithm | Quantum SVM · Quantum k-nearest neighbours · Quantum clustering · Quantum neural network (QNN, uses no kernel) |
 
-| Tab (key) | Data | Result on unseen data (quantum vs classical) |
-| --- | --- | --- |
-| Quantum SVM (**1**) | two half-moons, 40 dots + 20 unseen | 18/20 vs classical SVM 20/20 |
-| Quantum clustering (**2**) | three blobs, 30 dots, no labels | 30/30 vs k-means 30/30 |
-| Quantum CNN (**3**) | 4×4 line pictures, lying vs standing, 33 + 15 unseen | 14/15 vs small neural network 12/15 |
+The right side shows each step: the data table, the encoding circuit for row 1, the kernel table
+(coloured grid) and the result: quantum vs classical score on rows kept aside for testing, a plot,
+a ✓/✗ table per row, and the QNN's training curve. **Show code** gives the whole chosen pipeline as
+one runnable Python script (Qiskit + scikit-learn).
 
-Use **→** / **←** (or **E**) to move between steps. Every step has **Show details** (the maths)
-and **Show code** (Qiskit and PennyLane). The QCNN has no kernel: step 4 shows its trainable
-circuit instead, and step 5 replays its training curve (it was trained ahead of time).
+**Upload rules:** a CSV with a header row, up to **10 number columns** and **60 rows**, plus one label
+column (called `label`, or any single text column such as `result` = pass/fail). A file that breaks a
+rule shows one sentence. Clustering also works without a label column.
 
-**Datasets** (all generated from fixed seeds) are in
-[`frontend/public/datasets/pipeline/`](frontend/public/datasets/pipeline/) and download from
-`<your-vercel-link>/datasets/pipeline/moons_train.csv` (also `moons_test.csv`, `blobs.csv`,
-`lines_train.csv`, `lines_test.csv`).
+**Speed:** with the 4-column samples every combination answers in under 2 seconds. The slowest case
+(10 columns = 10 qubits) takes about 5 seconds, or about 12 seconds for the QNN.
+
+The sample CSVs are in [`frontend/public/datasets/samples/`](frontend/public/datasets/samples/) (all synthetic,
+no real people). Each has a **Download this sample** link in the app.
+
+### Guided demo
+
+The **Guided demo** button opens the fixed six-step lecture walkthrough (data → prepare → encode →
+compare pairs → learn → result) for a Quantum SVM on two moons, quantum clustering on three blobs, and a
+Quantum CNN on 4×4 line pictures. Keys: **1**–**3** pick the algorithm, **→** / **←** move between steps.
+Its datasets are in [`frontend/public/datasets/pipeline/`](frontend/public/datasets/pipeline/).
 
 **Notebook for students:** [`notebooks/qml_pipeline.ipynb`](notebooks/qml_pipeline.ipynb) runs the
-same three pipelines with the same numbers. To run it in Google Colab, open
+guided demo's three pipelines with the same numbers. To run it in Google Colab, open
 [colab.research.google.com](https://colab.research.google.com), choose **GitHub**, paste this
 repository's URL and pick the notebook (the repository must be public), or download the file and
-use **File → Upload notebook**. Then **Runtime → Run all** (about a minute for installs, then 40 s).
-
-The plan behind it is in [PIPELINE_PLAN.md](PIPELINE_PLAN.md).
+use **File → Upload notebook**. Then **Runtime → Run all**.
 
 ---
 
@@ -139,5 +149,6 @@ Tests: `pip install -r backend/requirements-dev.txt` then `cd backend && pytest`
 Layout: `backend/app/main.py` (FastAPI app, one `APIRouter` under `/api`), `backend/app/encoders/`
 (one file per encoding), `backend/app/snippets/` (code shown in the drawer),
 `frontend/src/EncodingLab.tsx` (the whole app as one `<EncodingLab />` component),
-`backend/app/pipeline/` and `frontend/src/pipeline/` (the Pipeline screen, `POST /api/pipeline`).
+`backend/app/pipeline/` and `frontend/src/pipeline/` (the Pipeline Builder: `POST /api/builder/encode` and
+`/api/builder/run`; the Guided demo: `POST /api/pipeline`).
 Retrain the QCNN with `cd backend && python -m app.pipeline.qcnn`.

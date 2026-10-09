@@ -1,5 +1,10 @@
 # QML Pipeline: Build Plan (add-on to the Encoding Lab)
 
+> **Update (Oct 9): the main Pipeline screen is now the Pipeline Builder.** Students upload a dataset
+> (or pick a student, healthcare, finance or moons sample), then choose an encoding, a quantum kernel
+> and an algorithm from drop-down menus and run it. See README, "The QML Pipeline Builder". The fixed
+> six-step walkthrough below is kept as the **Guided demo**.
+
 Oct 9, 2026 · draft for review · lecture in 2 days
 
 ## Overview

@@ -224,7 +224,13 @@ function Extra({ data, step, pair }: { data: PipelineResult; step: number; pair:
   return null;
 }
 
-export default function Pipeline({ onOpenEncodings }: { onOpenEncodings?: () => void }) {
+export default function Pipeline({
+  onOpenEncodings,
+  onOpenBuilder,
+}: {
+  onOpenEncodings?: () => void;
+  onOpenBuilder?: () => void;
+}) {
   const [algorithm, setAlgorithm] = useState<Algorithm>("qsvm");
   const [step, setStep] = useState(0);
   const [cache, setCache] = useState<Partial<Record<Algorithm, PipelineResult>>>({});
@@ -294,7 +300,7 @@ export default function Pipeline({ onOpenEncodings }: { onOpenEncodings?: () => 
   return (
     <div className="min-h-screen bg-black px-8 py-6 text-zinc-100">
       <header className="flex flex-wrap items-center gap-4">
-        <h1 className="mr-4 text-2xl font-bold text-white">QML Pipeline</h1>
+        <h1 className="mr-4 text-2xl font-bold text-white">Guided demo</h1>
         <nav className="flex gap-2">
           {ALGORITHMS.map((a, i) => (
             <button
@@ -310,14 +316,24 @@ export default function Pipeline({ onOpenEncodings }: { onOpenEncodings?: () => 
           ))}
         </nav>
         <p className="text-xl text-zinc-300">{ALGORITHMS.find((a) => a.id === algorithm)!.headline}</p>
-        {onOpenEncodings && (
-          <button
-            onClick={onOpenEncodings}
-            className="ml-auto rounded-xl bg-zinc-900 px-5 py-3 text-lg font-semibold text-zinc-200 hover:bg-zinc-800"
-          >
-            ← Encodings
-          </button>
-        )}
+        <div className="ml-auto flex gap-3">
+          {onOpenBuilder && (
+            <button
+              onClick={onOpenBuilder}
+              className="rounded-xl bg-zinc-900 px-5 py-3 text-lg font-semibold text-zinc-200 hover:bg-zinc-800"
+            >
+              Pipeline builder
+            </button>
+          )}
+          {onOpenEncodings && (
+            <button
+              onClick={onOpenEncodings}
+              className="rounded-xl bg-zinc-900 px-5 py-3 text-lg font-semibold text-zinc-200 hover:bg-zinc-800"
+            >
+              ← Encodings
+            </button>
+          )}
+        </div>
       </header>
 
       {/* The pipeline itself: always visible, so everyone knows where we are */}
