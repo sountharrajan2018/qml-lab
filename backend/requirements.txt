@@ -4,3 +4,4 @@ qiskit==1.4.6
 matplotlib==3.11.2
 pylatexenc==2.11
 numpy==2.4.6
+scikit-learn==1.9.1
